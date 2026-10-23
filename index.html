@@ -82,11 +82,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
 <li><h3>Resolve</h3><p>After closing, the resolver reports the outcome on-chain.</p></li>
 <li><h3>Claim</h3><p>Winners split the whole pool in proportion to their stake. Voided markets refund everyone.</p></li></ol></div></section>
 <section class="band"><div class="wrap"><h2>Know a niche better than the crowd?</h2><div class="cta"><a class="btn" href="create.html">Open a market</a></div></div></section></main>
-<footer><div class="wrap"><div><b>Odds</b><br>Demo contracts, unaudited.<br>Running on BOT Chain testnet (chain ID 968).</div>
+<footer><div class="wrap"><div><b>Odds</b><br>Demo contracts, unaudited.<br>Running on BOT Chain mainnet (chain ID 677).</div>
 <div class="fcol"><b>Pages</b><a href="index.html">Home</a><a href="markets.html">Markets</a><a href="create.html">Open a market</a></div>
-<div class="fcol"><b>BOT Chain</b><a href="http://botchain.ai" target="_blank" rel="noopener noreferrer">Website</a><a href="http://scan.bohr.life" target="_blank" rel="noopener noreferrer">Block explorer</a><a id="fcontract" href="#" target="_blank" rel="noopener noreferrer" hidden>This contract on explorer</a></div></div></footer>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script><script>window.ethers||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"><\/script>')</script><script>// Network settings for BOT Chain testnet. The contract address is entered on the site itself.
-window.CONFIG={address:"",rpc:"https://rpc.bohr.life",explorer:"https://scan.bohr.life",chainId:968,chainName:"BOT Chain Testnet",symbol:"BOT",
+<div class="fcol"><b>BOT Chain</b><a href="http://botchain.ai" target="_blank" rel="noopener noreferrer">Website</a><a href="http://scan.botchain.ai" target="_blank" rel="noopener noreferrer">Block explorer</a><a id="fcontract" href="#" target="_blank" rel="noopener noreferrer" hidden>This contract on explorer</a></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script><script>window.ethers||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"><\/script>')</script><script>// Network settings for BOT Chain mainnet. The contract address is entered on the site itself.
+window.CONFIG={address:"0xB2a2Bd871a2f9170170c88B510A90c17c0403A06",rpc:"https://rpc.botchain.ai",explorer:"https://scan.botchain.ai",chainId:677,chainName:"BOT Chain mainnet",symbol:"BOT",
 abi:["function marketCount() view returns (uint256)",
 "function getMarket(uint256) view returns (string question,uint64 closeTime,address resolver,uint256 yesPool,uint256 noPool,uint8 state,bool outcome)",
 "function yesStake(uint256,address) view returns (uint256)","function noStake(uint256,address) view returns (uint256)","function claimed(uint256,address) view returns (bool)",
