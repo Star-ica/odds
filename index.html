@@ -117,16 +117,69 @@ const App={me:null,signer:null,_r:null,chainOk:false,
    catch(e2){console.error(e2);toast('Could not add '+CFG.chainName+' ('+(e2.message||e2.code)+'). Add it manually in your wallet: RPC '+CFG.rpc+', chain ID '+CFG.chainId+', symbol '+CFG.symbol+'.','err');return false}
   }
   return await is()},
- async connect(quiet){
-  const w=window.ethereum;
-  if(!w){if(!quiet)toast(location.protocol==='file:'?'No wallet detected. Wallet extensions cannot see pages opened as local files. Host the folder (for example on Vercel or with “npx serve”) or enable “Allow access to file URLs” for your wallet extension. On a phone, open this site inside your wallet’s built-in browser.':'No wallet detected. Install MetaMask, or open this site inside your wallet’s built-in browser.','err');return null}
-  try{
-   const a=await w.request({method:quiet?'eth_accounts':'eth_requestAccounts'});
-   if(!a.length)return null;
-   if(!quiet)await this.ensureChain();
-   this.signer=await new E.BrowserProvider(w).getSigner();this.me=await this.signer.getAddress();await this.paint();return this.me
-  }catch(e){console.error(e);if(!quiet)toast(e.code===4001?'Connection request was rejected in your wallet.':e.code===-32002?'A wallet request is already pending. Open your wallet and approve it.':(e.shortMessage||e.message||'Could not connect.'),'err');return null}},
- async paint(){
+ // Replace the connect() method body:
+async connect(quiet) {
+  const w = window.ethereum;
+  if (!w) {
+    if (!quiet) toast(
+      location.protocol === 'file:'
+        ? 'No wallet detected. Host the folder (e.g. "npx serve") or enable "Allow access to file URLs" for your wallet extension.'
+        : 'No wallet detected. Install MetaMask, or open this site inside your wallet\'s built-in browser.',
+      'err'
+    );
+    return null;
+  }
+  try {
+    const a = await w.request({ method: quiet ? 'eth_accounts' : 'eth_requestAccounts' });
+    if (!a.length) return null;
+
+    // Always try to switch chain — silently on auto-connect, with feedback on manual
+    const switched = await this.ensureChain(quiet);
+    if (!quiet && !switched) return null; // manual connect: abort if user rejected
+
+    this.signer = await new E.BrowserProvider(w).getSigner();
+    this.me     = await this.signer.getAddress();
+    await this.paint();
+    return this.me;
+  } catch (e) {
+    console.error(e);
+    if (!quiet) toast(
+      e.code === 4001          ? 'Connection request was rejected in your wallet.'
+      : e.code === -32002      ? 'A wallet request is already pending. Open your wallet and approve it.'
+      : (e.shortMessage || e.message || 'Could not connect.'),
+      'err'
+    );
+    return null;
+  }
+},
+
+// Update ensureChain to accept a quiet flag:
+async ensureChain(quiet = false) {
+  const w = window.ethereum;
+  const is = async () => parseInt(await w.request({ method: 'eth_chainId' }), 16) === CFG.chainId;
+  if (await is()) return true;
+  try {
+    await w.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: HEX }] });
+  } catch (e) {
+    if (e.code === 4001) {
+      if (!quiet) toast('Network switch was rejected. Please switch to ' + CFG.chainName + ' (chain ID ' + CFG.chainId + ').', 'err');
+      return false;
+    }
+    try {
+      await w.request({
+        method: 'wallet_addEthereumChain',
+        params: [{ chainId: HEX, chainName: CFG.chainName,
+          nativeCurrency: { name: CFG.symbol, symbol: CFG.symbol, decimals: 18 },
+          rpcUrls: [CFG.rpc], blockExplorerUrls: [CFG.explorer] }]
+      });
+    } catch (e2) {
+      if (!quiet) toast('Could not add ' + CFG.chainName + '. Add it manually: RPC ' + CFG.rpc + ', chain ID ' + CFG.chainId + ', symbol ' + CFG.symbol + '.', 'err');
+      return false;
+    }
+  }
+  return await is();
+},
+  async paint(){
   let ok=false;if(this.me&&window.ethereum){try{ok=parseInt(await window.ethereum.request({method:'eth_chainId'}),16)===CFG.chainId}catch{}}
   this.chainOk=ok;const b=$('#connect');
   if(b){b.textContent=!this.me?'Connect wallet':ok?short(this.me):'Wrong network: switch';b.title=this.me||''}
